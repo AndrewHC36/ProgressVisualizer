@@ -9,7 +9,7 @@ a Google Tasks app. Good luck! :)
 Once you are able to retrieve the `credentials.json`, you'll be redirected
 to the OAuth screen. How cool is that? (Not like anyone's going to use this)
 
-Only tested on Win10 x64 with Python version IDK because I'm just that lazy.
+Only tested on Win10 x64 with Python version 3.9.*.
 
 
 Since this application is purely for visualization, it only has a single

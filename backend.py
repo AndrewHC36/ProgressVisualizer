@@ -17,6 +17,7 @@ def retrieve_task_data(cred_fpath: str):
     """
     :param cred_fpath: File path to `credentials.json`
     """
+    print("Requesting task data from Google Tasks...")
 
     creds = None
 
@@ -67,6 +68,7 @@ def retrieve_task_data(cred_fpath: str):
                     task = (overdue, duedate, complete)
                     data[item["title"]].append(task)
 
+        print("Successful!")
         return data
     except HttpError as err:
         print(err)
@@ -110,7 +112,6 @@ def timedelta_convert(td: timedelta):
 
 def process_tasks(cur_tdt: list[tuple[bool, datetime, datetime]]):
     today = datetime.today()
-    print(">>", today.month, today.day, today.weekday())
 
     mdt = {"unfinished": 0, "soon": 0, "overdue": 0, "finished": 0,}
     wdt = {"unfinished": 0, "soon": 0, "overdue": 0, "finished": 0,}
@@ -158,12 +159,3 @@ def process_tasks(cur_tdt: list[tuple[bool, datetime, datetime]]):
         "daily": (datetime.today().strftime("%m/%d"), ddt),
     }
 
-
-if __name__ == '__main__':
-    data = retrieve_task_data("credentials.json")
-    print(data)
-    for k in data:
-        print(k)
-        for l in data[k]:
-            print("\t", l)
-            if l[1] is not None: print(l[1])

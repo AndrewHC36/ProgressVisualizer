@@ -1,6 +1,5 @@
 import tkinter as tk
 import tkinter.font as tkf
-import functools
 from datetime import datetime
 from typing import Optional
 
@@ -13,7 +12,7 @@ def bar_chart(data: dict[str, int], c: tk.Canvas, new=True, items: Optional[list
 	:param data: Same as pie chart
 	"""
 	pad = 20
-	total = functools.reduce(lambda a, b: a+b, data.values())
+	total = sum(list(data.values()))
 
 	# store the canvas item instances for updating them later
 	bar_items = items if not new else []
@@ -53,7 +52,7 @@ def pie_chart(data: dict[str, int], c: tk.Canvas, new=True, items: Optional[list
 	:param data: A dictionary with a key of color "#FFFFFF" and the ratio in integer
 	"""
 	size = 150
-	total = functools.reduce(lambda a,b: a+b, data.values())
+	total = sum(list(data.values()))
 
 	# store the canvas item instances for updating them later
 	pie_items = items if not new else []
@@ -113,25 +112,21 @@ i_weekly: tuple[list, list]
 i_daily: tuple[list, list]
 
 def update_timef():
+	global task_data, monthly_dt, weekly_dt, daily_dt, c_monthly, c_weekly, c_daily, i_monthly, i_weekly, i_daily
+
+	task_data = backend.retrieve_task_data("credentials.json")
+
 	res = backend.process_tasks(task_data[selc.get()])
 	mo_lbl.set(f"Monthly Progress [{res['monthly'][0]}]")
 	wk_lbl.set(f"Weekly Progress [{res['weekly'][0]}]")
 	dy_lbl.set(f"Daily Progress [{res['daily'][0]}]")
 
 	mapper = {"unfinished": "#FFAA00", "soon": "#FF8833", "overdue": "#FF0000", "finished": "#00FF00"}
-
-	global monthly_dt, weekly_dt, daily_dt
 	monthly_dt = {mapper[k]: res["monthly"][1][k] for k in res["monthly"][1]}
 	weekly_dt = {mapper[k]: res["weekly"][1][k] for k in res["weekly"][1]}
 	daily_dt = {mapper[k]: res["daily"][1][k] for k in res["daily"][1]}
 
-	global c_monthly, c_weekly, c_daily
-	c_monthly.update_idletasks()
-	c_weekly.update_idletasks()
-	c_daily.update_idletasks()
-
 	# assuming the charts are initially created somewhere else
-	global i_monthly, i_weekly, i_daily
 	if "i_monthly" in globals():
 		bar_chart(monthly_dt, c_monthly, new=False, items=i_monthly[0])
 		pie_chart(monthly_dt, c_monthly, new=False, items=i_monthly[1])
