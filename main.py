@@ -2,8 +2,12 @@ import tkinter as tk
 import tkinter.font as tkf
 from datetime import datetime
 from typing import Optional
+from os import path
 
 import backend
+
+
+CRED_FILE = path.dirname(path.realpath(__file__))+"\\credentials.json"
 
 
 # (HORIZONTAL) BAR CHART
@@ -91,7 +95,7 @@ tk_grid = tk.Entry()
 
 # -- header controls --
 
-task_data: dict[str, list[tuple[bool, datetime, datetime]]] = backend.retrieve_task_data("credentials.json")
+task_data: dict[str, list[tuple[bool, datetime, datetime]]] = backend.retrieve_task_data(CRED_FILE)
 
 selc = tk.StringVar()  # tracker variable for the current selection of OptionMenu
 selc.set(list(task_data.keys())[0])
@@ -114,7 +118,7 @@ i_daily: tuple[list, list]
 def update_timef():
 	global task_data, monthly_dt, weekly_dt, daily_dt, c_monthly, c_weekly, c_daily, i_monthly, i_weekly, i_daily
 
-	task_data = backend.retrieve_task_data("credentials.json")
+	task_data = backend.retrieve_task_data(CRED_FILE)
 
 	res = backend.process_tasks(task_data[selc.get()])
 	mo_lbl.set(f"Monthly Progress [{res['monthly'][0]}]")
