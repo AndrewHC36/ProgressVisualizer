@@ -1,5 +1,8 @@
 from os import path
+import os
+import time
 
+from google.auth.exceptions import RefreshError
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -11,7 +14,7 @@ from datetime import datetime, timedelta
 
 # If modifying these scopes, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/tasks.readonly']
-TOKEN_FILE = CRED_FILE = path.dirname(path.realpath(__file__))+"\\token.json"
+TOKEN_FILE = path.dirname(path.realpath(__file__))+"\\token.json"
 
 
 def retrieve_task_data(cred_fpath: str):
@@ -30,7 +33,13 @@ def retrieve_task_data(cred_fpath: str):
     # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
+            try:
+                creds.refresh(Request())
+            except RefreshError:  # generally, when the token file is expired, the user needs to re-signin again
+                os.remove(TOKEN_FILE)
+                # installs and replace the token.json file
+                flow = InstalledAppFlow.from_client_secrets_file(cred_fpath, SCOPES)
+                creds = flow.run_local_server(port=0)
         else:
             flow = InstalledAppFlow.from_client_secrets_file(cred_fpath, SCOPES)
             creds = flow.run_local_server(port=0)
